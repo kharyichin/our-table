@@ -1,0 +1,12 @@
+{
+  "name": "Our Table",
+  "short_name": "Our Table",
+  "description": "Turn the meals we discover and cook into a story we can keep.",
+  "start_url": "/home",
+  "display": "standalone",
+  "background_color": "#faf1e2",
+  "theme_color": "#faf1e2",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

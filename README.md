@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Our Table
 
-## Getting Started
+A shared, illustrated household food archive. Capture recipe ideas and grocery finds from a Telegram group, plan the week as a storybook spread, generate a shopping list, and keep the cooking memories that turn meals into a family's food story.
 
-First, run the development server:
+> "Turn the meals we discover and cook into a story we can keep."
+
+## Stack
+
+- Next.js (App Router) + TypeScript + Tailwind CSS v4
+- Supabase (Postgres + Auth + Storage) — optional; see **Demo mode** below
+- Telegram Bot API (webhook-based capture + light commands)
+- Installable PWA (manifest + offline app-shell service worker)
+
+## Quickstart
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000). **No environment variables are required** — without `NEXT_PUBLIC_SUPABASE_URL` set, the app runs entirely against an in-memory demo dataset (`src/lib/demo-data.ts`) seeded with a sample household, five recipes, four grocery finds, a weekly plan, and three cooking memories. Every feature — creating recipes, planning the week, checking off shopping items, logging memories, even the Telegram webhook — works in this mode. State resets when the dev server restarts.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Connecting real Supabase + Telegram
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Create a Supabase project, then run the migrations in `supabase/migrations/` in order (via the SQL editor or `supabase db push`).
+2. Copy `.env.example` to `.env.local` and fill in `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` from your project's API settings.
+3. Sign in through the app and create a household, or accept an invitation to an existing household.
+4. Create a Telegram bot via [@BotFather](https://t.me/BotFather), set `TELEGRAM_BOT_TOKEN`, and register the webhook:
+   ```bash
+   curl "https://api.telegram.org/bot<TOKEN>/setWebhook?url=<APP_URL>/api/telegram/webhook&secret_token=<TELEGRAM_WEBHOOK_SECRET>"
+   ```
+5. As the household owner, open Household Settings, generate a one-time linking command, and send it inside the Telegram group. The code expires after 15 minutes.
+6. Set `NEXT_PUBLIC_APP_URL` to your deployed URL so bot replies link back correctly.
 
-## Learn More
+## Project structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/app/                   routes: /home /ideas /recipes/[id] /week /finds /shopping /memories /household/settings /account
+src/app/api/telegram/webhook/route.ts   Telegram webhook (idempotent capture → draft recipe/grocery find)
+src/app/*/actions.ts       Server Actions used by client forms (create/update/delete)
+src/lib/data/              data-access layer — Supabase when configured, in-memory store otherwise
+src/lib/telegram/          hashtag/URL parsing, capture classification, bot commands, sendMessage client
+src/lib/memoryBook.ts      deterministic monthly-summary calculation for the Memory Book
+src/components/illustrations/  small original paper-cut-style SVG illustration system
+supabase/migrations/       schema, RLS policies, storage bucket
+supabase/seed.sql          matches src/lib/demo-data.ts
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Design system
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Warm cream backgrounds, hand-cut paper-collage cards (layered shadows, slight rotation, subtle grain), a playful display font (Fredoka) over a rounded body font (Nunito), and a small deterministic illustration system (`src/components/illustrations/FoodIllustration.tsx`) that picks from a handful of paper-cut dish/ingredient glyphs by hashing each recipe's id — no AI image generation required, and the product stays fully usable if that's never wired up.
 
-## Deploy on Vercel
+## Known gaps / manual setup
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Cooking memory photos** upload to a Supabase Storage bucket (`memory-photos`, created by `supabase/migrations/0003_storage.sql`) when Supabase is configured; in demo mode they're kept as in-memory data URLs so the feature is still testable end to end.
+- **Telegram capture photos** are copied into the private `telegram-media` bucket and served through an authenticated, household-scoped app route; Telegram's temporary token-bearing URLs are never persisted.
+- **Telegram testing on localhost** requires a secure public tunnel because Telegram must be able to reach `/api/telegram/webhook`. Production should use the deployed HTTPS URL.
+- The Telegram classifier (`src/lib/telegram/parse.ts`) is a deterministic heuristic (hashtags, URLs, store names, price patterns), not ML — genuinely ambiguous messages correctly fall back to the in-app inbox on `/ideas` rather than guessing.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Commands
+
+```bash
+npm run dev      # start the dev server (http://localhost:3000)
+npm run build    # production build
+npm run start    # run the production build
+npm run lint     # ESLint
+npx tsc --noEmit # type-check
+```
