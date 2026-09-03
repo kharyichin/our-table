@@ -17,11 +17,19 @@ type JsonObject = Record<string, unknown>;
 
 export function decodeHtmlEntities(value: string): string {
   const named: Record<string, string> = { amp: "&", quot: '"', apos: "'", lt: "<", gt: ">", nbsp: " " };
-  return value.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (entity, code: string) => {
-    if (code[0] !== "#") return named[code.toLowerCase()] ?? entity;
-    const numeric = code[1].toLowerCase() === "x" ? parseInt(code.slice(2), 16) : parseInt(code.slice(1), 10);
-    return Number.isFinite(numeric) ? String.fromCodePoint(numeric) : entity;
-  });
+  let decoded = value;
+  // Some publishers double-encode entities (for example &amp;#32;). A few
+  // bounded passes handle those safely without risking an unending loop.
+  for (let pass = 0; pass < 3; pass++) {
+    const next = decoded.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (entity, code: string) => {
+      if (code[0] !== "#") return named[code.toLowerCase()] ?? entity;
+      const numeric = code[1].toLowerCase() === "x" ? parseInt(code.slice(2), 16) : parseInt(code.slice(1), 10);
+      return Number.isFinite(numeric) ? String.fromCodePoint(numeric) : entity;
+    });
+    if (next === decoded) break;
+    decoded = next;
+  }
+  return decoded;
 }
 
 function objectsIn(value: unknown): JsonObject[] {

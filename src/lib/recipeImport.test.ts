@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { extractRecipeFromHtml } from "./recipeImport";
+import { decodeHtmlEntities, extractRecipeFromHtml } from "./recipeImport";
 
 describe("extractRecipeFromHtml", () => {
   it("extracts a Recipe from a schema.org graph", () => {
@@ -26,5 +26,9 @@ describe("extractRecipeFromHtml", () => {
 
   it("returns null when the page has no usable recipe metadata", () => {
     expect(extractRecipeFromHtml("<html><h1>Dinner</h1></html>")).toBeNull();
+  });
+
+  it("decodes numeric and double-encoded entities", () => {
+    expect(decodeHtmlEntities("Nami&#39;s Tip: ½ cup&amp;#32;dashi")).toBe("Nami's Tip: ½ cup dashi");
   });
 });

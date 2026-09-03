@@ -48,12 +48,15 @@ export function RecipeDetailActions({
       <Button size="sm" onClick={() => setPlanning(true)}>Add to this week</Button>
       <Button variant="basil" size="sm" onClick={() => setLogging(true)}>Log a memory</Button>
       <Button variant="secondary" size="sm" onClick={() => setEditing(true)}>Edit</Button>
-      {recipe.sourceUrl && (!recipe.ingredients.length || !recipe.instructions) && (
-        <Button variant="secondary" size="sm" disabled={isPending} onClick={() => run(async () => {
-          await importRecipeFromSourceAction(recipe.id);
-          router.refresh();
-        }, { success: "Recipe imported from its original source." })}>
-          Import from source
+      {recipe.sourceUrl && (
+        <Button variant="secondary" size="sm" disabled={isPending} onClick={() => {
+          if (!confirm("Refresh this recipe from its original source? This replaces the saved title, description, serving count, image, ingredients, and method.")) return;
+          run(async () => {
+            await importRecipeFromSourceAction(recipe.id);
+            router.refresh();
+          }, { success: "Recipe refreshed from its original source." });
+        }}>
+          Refresh from source
         </Button>
       )}
       <Button
