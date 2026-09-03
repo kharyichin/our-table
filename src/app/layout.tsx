@@ -25,6 +25,7 @@ export const metadata: Metadata = {
   title: "Our Table",
   description: "Turn the meals we discover and cook into a story we can keep.",
   manifest: "/manifest.webmanifest",
+  icons: { icon: "/icon.svg", apple: "/apple-touch-icon.png" },
   appleWebApp: { capable: true, statusBarStyle: "default", title: "Our Table" },
 };
 

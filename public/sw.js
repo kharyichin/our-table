@@ -1,7 +1,7 @@
-// Minimal app-shell service worker: cache-first for static assets, network
-// falling back to cache for navigations, so the shell still loads offline.
-const CACHE = "our-table-v1";
-const SHELL = ["/home", "/manifest.webmanifest", "/icon.svg"];
+// Keep only public shell assets in the durable cache. Household pages are
+// private and must never be stored as a generic offline fallback.
+const CACHE = "our-table-v2";
+const SHELL = ["/offline.html", "/manifest.webmanifest", "/icon.svg", "/icon-192.png", "/icon-512.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)));
@@ -18,10 +18,15 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   if (request.method !== "GET") return;
+  const url = new URL(request.url);
+
+  // Authenticated API responses can contain household photos and Telegram
+  // media. Leave those entirely to the network and browser HTTP cache.
+  if (url.origin === self.location.origin && url.pathname.startsWith("/api/")) return;
 
   if (request.mode === "navigate") {
     event.respondWith(
-      fetch(request).catch(() => caches.match(request).then((res) => res ?? caches.match("/home")))
+      fetch(request).catch(() => caches.match("/offline.html"))
     );
     return;
   }
@@ -31,7 +36,7 @@ self.addEventListener("fetch", (event) => {
       caches.match(request).then((cached) => {
         const network = fetch(request)
           .then((res) => {
-            caches.open(CACHE).then((cache) => cache.put(request, res.clone()));
+            if (res.ok) caches.open(CACHE).then((cache) => cache.put(request, res.clone()));
             return res;
           })
           .catch(() => cached);

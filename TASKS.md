@@ -9,12 +9,11 @@ Effort guide: **S** = 1–3 hours, **M** = 4–8 hours, **L** = 1–3 focused da
 
 ### Then — verification and launch readiness
 
-- [ ] **Add data-layer integration tests** - household isolation, invitations, shopping regeneration, memory creation, and Telegram idempotency; depends on test Supabase; **L**
 - [ ] **Add the core end-to-end test** - capture → review → plan → shop → cook → memory → archive; depends on stable auth and routes; **L**
-- [ ] **Verify responsive PWA behavior** - desktop planning, tablet cooking, mobile shopping, installability, and offline shell; **M**
 
 ## Waiting On
 
+- [ ] **Add data-layer integration tests** - household isolation, invitations, shopping regeneration, memory creation, and Telegram idempotency; requires an isolated test Supabase URL, publishable key, and service-role key so fixtures cannot affect development data; **L**
 - [ ] **Configure Telegram credentials and public webhook** - add the bot token and a strong webhook secret, deploy or open a secure tunnel, then register and test the Telegram webhook
 - [ ] **Generate Supabase TypeScript definitions** - replace loosely typed row mapping after the finalized migrations are applied to the development project; **M**
 - [ ] **Confirm international-food artwork license tier** - free use requires visible rawpixel.com / Freepik attribution; premium terms differ
@@ -34,6 +33,7 @@ Effort guide: **S** = 1–3 hours, **M** = 4–8 hours, **L** = 1–3 focused da
 
 ## Done
 
+- [x] ~~Verify responsive PWA behavior~~ (2026-09-03)
 - [x] ~~Add domain unit tests~~ (2026-09-03)
 - [x] ~~Add route loading and error states~~ (2026-09-03)
 - [x] ~~Audit webhook secrets and RLS policies~~ (2026-09-02)
