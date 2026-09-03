@@ -9,7 +9,6 @@ Effort guide: **S** = 1–3 hours, **M** = 4–8 hours, **L** = 1–3 focused da
 
 ### Then — verification and launch readiness
 
-- [ ] **Add route loading and error states** - cover Home, Ideas, Week, Shopping, Memories, Recipe detail, and Household settings; **M**
 - [ ] **Add domain unit tests** - hashtag parsing, ingredient merging, week calculations, archive summaries, and state transitions; **M**
 - [ ] **Add data-layer integration tests** - household isolation, invitations, shopping regeneration, memory creation, and Telegram idempotency; depends on test Supabase; **L**
 - [ ] **Add the core end-to-end test** - capture → review → plan → shop → cook → memory → archive; depends on stable auth and routes; **L**
@@ -36,6 +35,7 @@ Effort guide: **S** = 1–3 hours, **M** = 4–8 hours, **L** = 1–3 focused da
 
 ## Done
 
+- [x] ~~Add route loading and error states~~ (2026-09-03)
 - [x] ~~Audit webhook secrets and RLS policies~~ (2026-09-02)
 - [x] ~~Create an implementation checkpoint~~ (2026-09-02)
 - [x] ~~Persist Telegram media safely~~ (2026-09-02)
