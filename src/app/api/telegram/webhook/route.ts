@@ -155,6 +155,7 @@ export async function POST(req: NextRequest) {
       title: imported?.title ?? classification.title,
       sourceUrl: urls[0] ?? null,
       description: imported?.description ?? (messageLink ? "Captured from Telegram." : null),
+      servings: imported?.servings ?? null,
       ingredients: imported?.ingredients ?? [],
       instructions: imported?.instructions ?? null,
       cuisineTags: recipeTags.cuisineTags,

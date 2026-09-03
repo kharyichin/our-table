@@ -6,15 +6,17 @@ describe("extractRecipeFromHtml", () => {
     const html = `<script type="application/ld+json">${JSON.stringify({
       "@graph": [{ "@type": "WebPage" }, {
         "@type": ["Recipe", "NewsArticle"],
-        name: "Oyakodon",
-        description: "Chicken and egg rice bowl",
+        name: "Nami&#39;s Oyakodon",
+        description: "Chicken &amp; egg rice bowl",
+        recipeYield: "2 servings",
         recipeIngredient: ["2 chicken thighs", "3 eggs"],
         recipeInstructions: [{ "@type": "HowToStep", text: "Simmer the chicken." }, { "@type": "HowToStep", text: "Add the eggs." }],
       }],
     })}</script>`;
     expect(extractRecipeFromHtml(html)).toEqual({
-      title: "Oyakodon",
-      description: "Chicken and egg rice bowl",
+      title: "Nami's Oyakodon",
+      description: "Chicken & egg rice bowl",
+      servings: "2 servings",
       ingredients: ["2 chicken thighs", "3 eggs"],
       instructions: "1. Simmer the chicken.\n\n2. Add the eggs.",
     });

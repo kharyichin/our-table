@@ -81,6 +81,7 @@ export const demoRecipes: Recipe[] = [
     sourceUrl: "https://example.com/recipe/chicken-katsu-curry",
     description:
       "Crispy panko chicken cutlet swimming in a glossy, mildly sweet curry sauce. Captured from the group chat after Jae found it at 11pm.",
+    servings: "4 servings",
     ingredients: [
       "2 boneless chicken thighs",
       "1 cup panko breadcrumbs",
@@ -109,6 +110,7 @@ export const demoRecipes: Recipe[] = [
     sourceUrl: "https://example.com/recipe/weeknight-fish-tacos",
     description:
       "Quick pan-seared white fish, lime-dressed cabbage slaw, warm corn tortillas. A 25-minute regular.",
+    servings: "4 servings",
     ingredients: [
       "1 lb white fish fillets",
       "8 corn tortillas",
@@ -136,6 +138,7 @@ export const demoRecipes: Recipe[] = [
     sourceUrl: null,
     description:
       "The slow tomato-pork sauce that started this whole household archive. No shortcuts allowed.",
+    servings: "6 servings",
     ingredients: [
       "2 lb pork shoulder",
       "28 oz crushed tomatoes",
@@ -162,6 +165,7 @@ export const demoRecipes: Recipe[] = [
     title: "Miso Glazed Salmon",
     sourceUrl: "https://example.com/recipe/miso-glazed-salmon",
     description: "Sticky-sweet miso glaze, five ingredients, done under the broiler in ten minutes.",
+    servings: "4 servings",
     ingredients: [
       "4 salmon fillets",
       "3 tbsp white miso",
@@ -188,6 +192,7 @@ export const demoRecipes: Recipe[] = [
     sourceUrl: "https://example.com/recipe/weekend-tofu-fried-rice",
     description:
       "Day-old rice, crispy tofu cubes, whatever vegetables are about to turn. A clean-out-the-fridge favorite.",
+    servings: "4 servings",
     ingredients: [
       "14 oz firm tofu, cubed",
       "3 cups day-old rice",

@@ -7,11 +7,21 @@ const FETCH_TIMEOUT_MS = 8_000;
 export interface ImportedRecipe {
   title: string | null;
   description: string | null;
+  servings: string | null;
   ingredients: string[];
   instructions: string | null;
 }
 
 type JsonObject = Record<string, unknown>;
+
+export function decodeHtmlEntities(value: string): string {
+  const named: Record<string, string> = { amp: "&", quot: '"', apos: "'", lt: "<", gt: ">", nbsp: " " };
+  return value.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (entity, code: string) => {
+    if (code[0] !== "#") return named[code.toLowerCase()] ?? entity;
+    const numeric = code[1].toLowerCase() === "x" ? parseInt(code.slice(2), 16) : parseInt(code.slice(1), 10);
+    return Number.isFinite(numeric) ? String.fromCodePoint(numeric) : entity;
+  });
+}
 
 function objectsIn(value: unknown): JsonObject[] {
   if (Array.isArray(value)) return value.flatMap(objectsIn);
@@ -26,13 +36,13 @@ function isRecipeNode(node: JsonObject): boolean {
 }
 
 function instructionLines(value: unknown): string[] {
-  if (typeof value === "string") return value.trim() ? [value.trim()] : [];
+  if (typeof value === "string") return value.trim() ? [decodeHtmlEntities(value.trim())] : [];
   if (Array.isArray(value)) return value.flatMap(instructionLines);
   if (!value || typeof value !== "object") return [];
   const item = value as JsonObject;
   if (item.itemListElement) return instructionLines(item.itemListElement);
   const text = typeof item.text === "string" ? item.text : typeof item.name === "string" ? item.name : "";
-  return text.trim() ? [text.trim()] : [];
+  return text.trim() ? [decodeHtmlEntities(text.trim())] : [];
 }
 
 export function extractRecipeFromHtml(html: string): ImportedRecipe | null {
@@ -43,12 +53,14 @@ export function extractRecipeFromHtml(html: string): ImportedRecipe | null {
       const node = objectsIn(parsed).find(isRecipeNode);
       if (!node) continue;
       const ingredients = Array.isArray(node.recipeIngredient)
-        ? node.recipeIngredient.map(String).map((item) => item.trim()).filter(Boolean)
+        ? node.recipeIngredient.map(String).map((item) => decodeHtmlEntities(item.trim())).filter(Boolean)
         : [];
       const steps = instructionLines(node.recipeInstructions);
+      const rawYield = Array.isArray(node.recipeYield) ? node.recipeYield[0] : node.recipeYield;
       return {
-        title: typeof node.name === "string" ? node.name.trim() || null : null,
-        description: typeof node.description === "string" ? node.description.trim() || null : null,
+        title: typeof node.name === "string" ? decodeHtmlEntities(node.name.trim()) || null : null,
+        description: typeof node.description === "string" ? decodeHtmlEntities(node.description.trim()) || null : null,
+        servings: rawYield === undefined || rawYield === null ? null : decodeHtmlEntities(String(rawYield).trim()) || null,
         ingredients,
         instructions: steps.length ? steps.map((step, index) => `${index + 1}. ${step}`).join("\n\n") : null,
       };

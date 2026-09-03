@@ -12,6 +12,7 @@ function mapRow(row: any): Recipe {
     title: row.title,
     sourceUrl: row.source_url,
     description: row.description,
+    servings: row.servings ?? null,
     ingredients: row.ingredients ?? [],
     instructions: row.instructions,
     cuisineTags: row.cuisine_tags ?? [],
@@ -29,6 +30,7 @@ export interface RecipeInput {
   title: string;
   sourceUrl?: string | null;
   description?: string | null;
+  servings?: string | null;
   ingredients?: string[];
   instructions?: string | null;
   cuisineTags?: string[];
@@ -77,6 +79,7 @@ export async function createRecipe(
         title: input.title,
         source_url: input.sourceUrl ?? null,
         description: input.description ?? null,
+        servings: input.servings ?? null,
         ingredients: input.ingredients ?? [],
         instructions: input.instructions ?? null,
         cuisine_tags: input.cuisineTags ?? [],
@@ -99,6 +102,7 @@ export async function createRecipe(
     title: input.title,
     sourceUrl: input.sourceUrl ?? null,
     description: input.description ?? null,
+    servings: input.servings ?? null,
     ingredients: input.ingredients ?? [],
     instructions: input.instructions ?? null,
     cuisineTags: input.cuisineTags ?? [],
@@ -121,6 +125,7 @@ export async function updateRecipe(id: string, input: Partial<RecipeInput>): Pro
     if (input.title !== undefined) patch.title = input.title;
     if (input.sourceUrl !== undefined) patch.source_url = input.sourceUrl;
     if (input.description !== undefined) patch.description = input.description;
+    if (input.servings !== undefined) patch.servings = input.servings;
     if (input.ingredients !== undefined) patch.ingredients = input.ingredients;
     if (input.instructions !== undefined) patch.instructions = input.instructions;
     if (input.cuisineTags !== undefined) patch.cuisine_tags = input.cuisineTags;

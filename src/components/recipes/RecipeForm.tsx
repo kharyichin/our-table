@@ -48,6 +48,11 @@ export function RecipeForm({ recipe, members, onSubmit, onDone, submitLabel = "S
         <textarea id="description" name="description" defaultValue={recipe?.description ?? ""} rows={2} className={fieldClass} placeholder="What makes this one worth keeping?" />
       </div>
 
+      <div>
+        <label className={labelClass} htmlFor="servings">Serves / recipe yield</label>
+        <input id="servings" name="servings" defaultValue={recipe?.servings ?? ""} className={fieldClass} placeholder="4 servings" />
+      </div>
+
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label className={labelClass} htmlFor="cuisineTags">Cuisine tags</label>

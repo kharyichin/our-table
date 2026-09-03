@@ -25,6 +25,7 @@ function buildRecipeInput(formData: FormData): RecipeInput {
     title: String(formData.get("title") ?? "").trim(),
     sourceUrl: (formData.get("sourceUrl") as string) || null,
     description: (formData.get("description") as string) || null,
+    servings: (formData.get("servings") as string) || null,
     ingredients: parseList(formData.get("ingredients")),
     instructions: (formData.get("instructions") as string) || null,
     cuisineTags: parseList(formData.get("cuisineTags")).map((t) => t.replace(/^#/, "").toLowerCase()),
@@ -66,6 +67,7 @@ export async function importRecipeFromSourceAction(id: string) {
   await updateRecipe(id, {
     title: imported.title ?? recipe.title,
     description: imported.description ?? recipe.description,
+    servings: imported.servings ?? recipe.servings,
     ingredients: imported.ingredients.length ? imported.ingredients : recipe.ingredients,
     instructions: imported.instructions ?? recipe.instructions,
   });

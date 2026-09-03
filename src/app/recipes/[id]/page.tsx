@@ -11,6 +11,7 @@ import { RecipeDetailActions } from "@/components/recipes/RecipeDetailActions";
 import { MemoryCard } from "@/components/memories/MemoryCard";
 import { formatDate } from "@/lib/utils";
 import { getOrCreateCurrentWeeklyPlan } from "@/lib/data/weeklyPlans";
+import { RecipeReadingView } from "@/components/recipes/RecipeReadingView";
 
 export default async function RecipeDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -58,6 +59,7 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
             )}
           </p>
           <div className="mt-3 flex flex-wrap gap-1.5">
+            {recipe.servings && <span className="rounded-full border border-line bg-paper-warm px-3 py-1 text-xs font-bold text-ink">{recipe.servings}</span>}
             {recipe.cuisineTags.map((t) => <Tag key={t} variant="cuisine">#{t}</Tag>)}
             {recipe.ingredientTags.map((t) => <Tag key={t} variant="ingredient">#{t}</Tag>)}
           </div>
@@ -72,32 +74,7 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
         />
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2">
-        <section className="paper-card p-5">
-          <h2 className="font-display mb-3 text-lg text-ink">Ingredients</h2>
-          {recipe.ingredients.length > 0 ? (
-            <ul className="flex flex-col gap-1.5 text-sm text-ink-soft">
-              {recipe.ingredients.map((ing, i) => (
-                <li key={i} className="flex gap-2">
-                  <span className="text-tomato">•</span>
-                  {ing}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-sm text-ink-soft">No ingredients listed yet.</p>
-          )}
-        </section>
-
-        <section className="paper-card p-5">
-          <h2 className="font-display mb-3 text-lg text-ink">Instructions</h2>
-          {recipe.instructions ? (
-            <p className="whitespace-pre-line text-sm text-ink-soft">{recipe.instructions}</p>
-          ) : (
-            <p className="text-sm text-ink-soft">No instructions written down yet.</p>
-          )}
-        </section>
-      </div>
+      <RecipeReadingView ingredients={recipe.ingredients} instructions={recipe.instructions} />
 
       {relatedFinds.length > 0 && (
         <section className="mt-6">
