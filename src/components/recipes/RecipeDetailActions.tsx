@@ -6,7 +6,7 @@ import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { RecipeForm } from "@/components/recipes/RecipeForm";
 import { CookingMemoryForm } from "@/components/memories/CookingMemoryForm";
-import { updateRecipeAction, deleteRecipeAction, changeRecipeStatusAction } from "@/app/recipes/actions";
+import { updateRecipeAction, deleteRecipeAction, changeRecipeStatusAction, importRecipeFromSourceAction } from "@/app/recipes/actions";
 import { planRecipeForDayAction } from "@/app/week/actions";
 import { DAY_LABELS_FULL } from "@/lib/types";
 import type { Recipe, RecipeStatus } from "@/lib/types";
@@ -48,6 +48,14 @@ export function RecipeDetailActions({
       <Button size="sm" onClick={() => setPlanning(true)}>Add to this week</Button>
       <Button variant="basil" size="sm" onClick={() => setLogging(true)}>Log a memory</Button>
       <Button variant="secondary" size="sm" onClick={() => setEditing(true)}>Edit</Button>
+      {recipe.sourceUrl && (!recipe.ingredients.length || !recipe.instructions) && (
+        <Button variant="secondary" size="sm" disabled={isPending} onClick={() => run(async () => {
+          await importRecipeFromSourceAction(recipe.id);
+          router.refresh();
+        }, { success: "Recipe imported from its original source." })}>
+          Import from source
+        </Button>
+      )}
       <Button
         variant="ghost"
         size="sm"

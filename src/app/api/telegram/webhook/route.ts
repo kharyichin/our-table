@@ -8,6 +8,7 @@ import { createGroceryFind } from "@/lib/data/groceryFinds";
 import { createHash } from "node:crypto";
 import { getSupabaseServiceClient } from "@/lib/supabase/server";
 import { persistTelegramPhoto } from "@/lib/telegram/media";
+import { importRecipeFromUrl } from "@/lib/recipeImport";
 
 const KNOWN_COMMANDS = new Set(["/help", "/thisweek", "/ideas", "/shopping", "/memories"]);
 
@@ -149,10 +150,13 @@ export async function POST(req: NextRequest) {
 
   if (classification.kind === "recipe") {
     const recipeTags = splitRecipeHashtags(hashtags);
+    const imported = urls[0] ? await importRecipeFromUrl(urls[0]) : null;
     const recipe = await createRecipe(householdId, {
-      title: classification.title,
+      title: imported?.title ?? classification.title,
       sourceUrl: urls[0] ?? null,
-      description: messageLink ? `Captured from Telegram.` : null,
+      description: imported?.description ?? (messageLink ? "Captured from Telegram." : null),
+      ingredients: imported?.ingredients ?? [],
+      instructions: imported?.instructions ?? null,
       cuisineTags: recipeTags.cuisineTags,
       ingredientTags: recipeTags.ingredientTags,
       status: "idea",

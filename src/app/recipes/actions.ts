@@ -9,6 +9,8 @@ import { upsertMealCard } from "@/lib/data/weeklyPlans";
 import { getSupabaseServiceClient } from "@/lib/supabase/server";
 import { randomUUID } from "node:crypto";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
+import { getRecipe } from "@/lib/data/recipes";
+import { importRecipeFromUrl } from "@/lib/recipeImport";
 
 function parseList(value: FormDataEntryValue | null): string[] {
   if (!value || typeof value !== "string") return [];
@@ -52,6 +54,23 @@ export async function updateRecipeAction(id: string, formData: FormData) {
   revalidatePath(`/recipes/${id}`);
   revalidatePath("/ideas");
   revalidatePath("/home");
+}
+
+export async function importRecipeFromSourceAction(id: string) {
+  const recipe = await getRecipe(id);
+  if (!recipe?.sourceUrl) throw new Error("This recipe does not have an original source link.");
+  const imported = await importRecipeFromUrl(recipe.sourceUrl);
+  if (!imported || (!imported.ingredients.length && !imported.instructions)) {
+    throw new Error("That website does not expose a structured recipe we can import. You can still add it with Edit.");
+  }
+  await updateRecipe(id, {
+    title: imported.title ?? recipe.title,
+    description: imported.description ?? recipe.description,
+    ingredients: imported.ingredients.length ? imported.ingredients : recipe.ingredients,
+    instructions: imported.instructions ?? recipe.instructions,
+  });
+  revalidatePath(`/recipes/${id}`);
+  revalidatePath("/ideas");
 }
 
 export async function deleteRecipeAction(id: string) {

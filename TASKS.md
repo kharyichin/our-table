@@ -31,6 +31,7 @@ Effort guide: **S** = 1–3 hours, **M** = 4–8 hours, **L** = 1–3 focused da
 
 ## Done
 
+- [x] ~~Import structured ingredients and instructions from recipe links~~ (2026-09-03)
 - [x] ~~Allow every household member to manage the Telegram connection~~ (2026-09-03)
 - [x] ~~Redesign authentication and household onboarding UX~~ (2026-09-03)
 - [x] ~~Add the core end-to-end test~~ (2026-09-03)
