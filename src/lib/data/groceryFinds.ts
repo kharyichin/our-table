@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- Supabase rows are mapped by hand here; typing every column would need generated types. */
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { demoStore, nextId } from "./store";
 import type { GroceryFind, GroceryFindWithLifecycle } from "@/lib/types";
 
@@ -111,10 +112,11 @@ export async function getGroceryFind(id: string): Promise<GroceryFind | null> {
 
 export async function createGroceryFind(
   householdId: string,
-  input: GroceryFindInput
+  input: GroceryFindInput,
+  trustedClient?: SupabaseClient
 ): Promise<GroceryFind> {
   if (isSupabaseConfigured()) {
-    const supabase = await getSupabaseServerClient();
+    const supabase = trustedClient ?? await getSupabaseServerClient();
     const { data, error } = await supabase!
       .from("grocery_finds")
       .insert({

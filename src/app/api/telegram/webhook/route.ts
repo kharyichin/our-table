@@ -134,13 +134,18 @@ export async function POST(req: NextRequest) {
     status: "needs_review",
   });
 
-  if (!isNew) {
+  const classification = classifyCapture(text, hashtags, urls);
+
+  if (!isNew && capture.status !== "needs_review") {
     // Telegram redelivered an update we already processed — stay idempotent
     // and don't create a second draft or send a second confirmation.
     return NextResponse.json({ ok: true, capture: capture.id, duplicate: true });
   }
 
-  const classification = classifyCapture(text, hashtags, urls);
+  const service = getSupabaseServiceClient();
+  if (!service) {
+    return NextResponse.json({ ok: false, error: "server configuration incomplete" }, { status: 500 });
+  }
 
   if (classification.kind === "recipe") {
     const recipeTags = splitRecipeHashtags(hashtags);
@@ -152,7 +157,7 @@ export async function POST(req: NextRequest) {
       ingredientTags: recipeTags.ingredientTags,
       status: "idea",
       discoveredDate: new Date().toISOString().slice(0, 10),
-    });
+    }, service);
     await updateCaptureLink(capture.id, recipe.id, null);
     const confidenceNote = classification.confidence === "medium" ? " (double-check the title!)" : "";
     await sendTelegramMessage(
@@ -168,7 +173,7 @@ export async function POST(req: NextRequest) {
       description: messageLink ? "Captured from Telegram." : null,
       imageUrl: imageUrls[0] ?? null,
       sourceUrl: urls[0] ?? null,
-    });
+    }, service);
     await updateCaptureLink(capture.id, null, find.id);
     await sendTelegramMessage(
       chatId,

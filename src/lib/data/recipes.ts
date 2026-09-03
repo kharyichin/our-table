@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- Supabase rows are mapped by hand here; typing every column would need generated types. */
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { demoStore, nextId } from "./store";
 import type { Recipe, RecipeStatus } from "@/lib/types";
 
@@ -61,10 +62,14 @@ export async function getRecipe(id: string): Promise<Recipe | null> {
   return demoStore.recipes.find((r) => r.id === id) ?? null;
 }
 
-export async function createRecipe(householdId: string, input: RecipeInput): Promise<Recipe> {
+export async function createRecipe(
+  householdId: string,
+  input: RecipeInput,
+  trustedClient?: SupabaseClient
+): Promise<Recipe> {
   const illustrationSeed = `${input.title}-${Date.now()}`;
   if (isSupabaseConfigured()) {
-    const supabase = await getSupabaseServerClient();
+    const supabase = trustedClient ?? await getSupabaseServerClient();
     const { data, error } = await supabase!
       .from("recipes")
       .insert({
