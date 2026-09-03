@@ -16,11 +16,17 @@ export function OnboardingForm({ defaultName }: { defaultName: string }) {
 
   return (
     <div className="mt-7">
-      <div className="chapter-view-switch mb-5" aria-label="Choose onboarding path">
-        <button className={mode === "create" ? "is-active" : ""} onClick={() => setMode("create")} type="button">Create a household</button>
-        <button className={mode === "join" ? "is-active" : ""} onClick={() => setMode("join")} type="button">Join with a code</button>
+      <div className="auth-paths" aria-label="Choose how to set your table">
+        <button className={mode === "create" ? "is-active" : ""} aria-pressed={mode === "create"} onClick={() => setMode("create")} type="button">
+          <strong>Start a new table</strong>
+          <span>Create the household and invite people afterward.</span>
+        </button>
+        <button className={mode === "join" ? "is-active" : ""} aria-pressed={mode === "join"} onClick={() => setMode("join")} type="button">
+          <strong>Join someone’s table</strong>
+          <span>Use the code from the invitation they shared.</span>
+        </button>
       </div>
-      <form action={mode === "create" ? createAction : joinAction} className="flex flex-col gap-4">
+      <form action={mode === "create" ? createAction : joinAction} className="auth-onboarding-form">
         <label>
           <span className={labelClass}>Your name</span>
           <input required name="displayName" defaultValue={defaultName} className={fieldClass} autoComplete="name" />
@@ -28,16 +34,16 @@ export function OnboardingForm({ defaultName }: { defaultName: string }) {
         {mode === "create" ? (
           <label>
             <span className={labelClass}>Household name</span>
-            <input required name="householdName" className={fieldClass} placeholder="Our Table" />
+            <input required name="householdName" className={fieldClass} placeholder="The Chen–Rivera table" />
           </label>
         ) : (
           <label>
             <span className={labelClass}>Invitation code</span>
-            <input required name="inviteCode" className={fieldClass} placeholder="table24" autoCapitalize="none" />
+            <input required name="inviteCode" className={fieldClass} placeholder="table24" autoCapitalize="none" autoCorrect="off" />
           </label>
         )}
-        {state.error && <p className="text-sm text-tomato-dark">{state.error}</p>}
-        <Button type="submit" disabled={creating || joining}>{creating || joining ? "Setting the table…" : mode === "create" ? "Create our household" : "Join the household"}</Button>
+        {state.error && <p role="alert" className="text-sm text-tomato-dark">{state.error}</p>}
+        <Button type="submit" size="lg" disabled={creating || joining}>{creating || joining ? "Setting the table…" : mode === "create" ? "Create our household" : "Join this household"}</Button>
       </form>
     </div>
   );

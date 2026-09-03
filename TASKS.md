@@ -19,7 +19,6 @@ Effort guide: **S** = 1–3 hours, **M** = 4–8 hours, **L** = 1–3 focused da
 
 ## Someday
 
-- [ ] **Redesign authentication and household onboarding UX** - replace the temporary form-heavy screen with the tactile cookbook experience, clarify account identity, and improve create/join switching
 - [ ] **Revisit cookbook opening and page-turn interaction** - replace the current experiment only after core flows are stable
 - [ ] **Integrate the international-food watercolor pack** - prepare individual optimized assets for recipes and menus after licensing is confirmed
   - Prefer the international-food pack over the ingredient sheet.
@@ -32,6 +31,7 @@ Effort guide: **S** = 1–3 hours, **M** = 4–8 hours, **L** = 1–3 focused da
 
 ## Done
 
+- [x] ~~Redesign authentication and household onboarding UX~~ (2026-09-03)
 - [x] ~~Add the core end-to-end test~~ (2026-09-03)
 - [x] ~~Verify responsive PWA behavior~~ (2026-09-03)
 - [x] ~~Add domain unit tests~~ (2026-09-03)

@@ -41,8 +41,13 @@ export function SignInForm({ initialError, next = "/home" }: { initialError?: st
       });
     }}>
       {sent ? (
-        <div className="rounded-xl border border-basil/30 bg-basil/10 p-4 text-sm text-basil-dark">
-          Check <strong>{email}</strong> for your sign-in link. You can close this page after opening the email.
+        <div className="auth-link-sent" role="status">
+          <p>We sent one link to</p>
+          <strong>{email}</strong>
+          <p>Open the newest email from Our Table. The link can only be used once.</p>
+          <button type="button" onClick={() => { setSent(false); setEmail(""); }}>
+            Use a different email
+          </button>
         </div>
       ) : (
         <>
@@ -50,8 +55,9 @@ export function SignInForm({ initialError, next = "/home" }: { initialError?: st
             <span className={labelClass}>Email address</span>
             <input required type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className={fieldClass} placeholder="you@example.com" />
           </label>
-          {error && <p className="text-sm text-tomato-dark">{error}</p>}
-          <Button type="submit" disabled={pending}>{pending ? "Sending link…" : "Email me a sign-in link"}</Button>
+          <p className="auth-form-note">We only use this address to identify your account and send the sign-in link.</p>
+          {error && <p role="alert" className="text-sm text-tomato-dark">{error}</p>}
+          <Button type="submit" size="lg" disabled={pending}>{pending ? "Sending one link…" : "Send my sign-in link"}</Button>
         </>
       )}
     </form>
