@@ -25,11 +25,13 @@ interface TelegramUpdate {
 
 export async function POST(req: NextRequest) {
   const secret = process.env.TELEGRAM_WEBHOOK_SECRET;
-  if (secret) {
-    const header = req.headers.get("x-telegram-bot-api-secret-token");
-    if (header !== secret) {
-      return NextResponse.json({ ok: false, error: "invalid secret" }, { status: 401 });
-    }
+  if (!secret) {
+    console.error("[telegram] TELEGRAM_WEBHOOK_SECRET is required");
+    return NextResponse.json({ ok: false, error: "webhook unavailable" }, { status: 503 });
+  }
+  const header = req.headers.get("x-telegram-bot-api-secret-token");
+  if (header !== secret) {
+    return NextResponse.json({ ok: false, error: "invalid secret" }, { status: 401 });
   }
 
   let update: TelegramUpdate;

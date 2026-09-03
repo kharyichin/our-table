@@ -26,11 +26,16 @@ export async function resolveCaptureAction(
   const serviceClient = isSupabaseConfigured() ? getSupabaseServiceClient() : null;
   if (serviceClient) {
     const supabase = serviceClient;
-    const { data: capture } = await supabase.from("captures").select("*").eq("id", captureId).maybeSingle();
+    const { data: capture } = await supabase
+      .from("captures")
+      .select("*")
+      .eq("id", captureId)
+      .eq("household_id", householdId)
+      .maybeSingle();
     if (!capture) return;
 
     if (decision === "dismiss") {
-      await supabase.from("captures").update({ status: "dismissed" }).eq("id", captureId);
+      await supabase.from("captures").update({ status: "dismissed" }).eq("id", captureId).eq("household_id", householdId);
     } else if (decision === "recipe") {
       const inferred = splitRecipeHashtags(capture.hashtags ?? []);
       const recipe = await createRecipe(householdId, {
@@ -43,7 +48,8 @@ export async function resolveCaptureAction(
       await supabase
         .from("captures")
         .update({ status: "linked", linked_recipe_id: recipe.id })
-        .eq("id", captureId);
+        .eq("id", captureId)
+        .eq("household_id", householdId);
     } else {
       const find = await createGroceryFind(householdId, {
         store: overrideStore || "Unknown store",
@@ -55,7 +61,8 @@ export async function resolveCaptureAction(
       await supabase
         .from("captures")
         .update({ status: "linked", linked_grocery_find_id: find.id })
-        .eq("id", captureId);
+        .eq("id", captureId)
+        .eq("household_id", householdId);
     }
   } else {
     const capture = demoStore.captures.find((c) => c.id === captureId);

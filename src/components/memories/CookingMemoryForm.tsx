@@ -1,14 +1,11 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { fieldClass, labelClass } from "@/components/ui/form";
 import { Button } from "@/components/ui/Button";
 import { createMemoryAction } from "@/app/recipes/actions";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { Recipe } from "@/lib/types";
 import { MutationFeedback } from "@/components/ui/MutationFeedback";
-
-const MEMORY_PHOTOS_BUCKET = "memory-photos";
 
 interface CookingMemoryFormProps {
   recipeId?: string;
@@ -25,37 +22,17 @@ export function CookingMemoryForm({ recipeId, mealCardId, planId, dayIndex, defa
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [rating, setRating] = useState(5);
-  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
-  const [photoUploading, setPhotoUploading] = useState(false);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+
+  useEffect(() => () => {
+    if (photoPreview) URL.revokeObjectURL(photoPreview);
+  }, [photoPreview]);
 
   async function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    setPhotoUploading(true);
-    try {
-      const supabase = getSupabaseBrowserClient();
-      if (supabase) {
-        const path = `${Date.now()}-${file.name}`;
-        const { error: uploadError } = await supabase.storage.from(MEMORY_PHOTOS_BUCKET).upload(path, file);
-        if (uploadError) throw uploadError;
-        const { data } = supabase.storage.from(MEMORY_PHOTOS_BUCKET).getPublicUrl(path);
-        setPhotoUrl(data.publicUrl);
-      } else {
-        // Demo mode with no Supabase Storage configured: keep the photo as a
-        // data URL in memory so the feature is still usable end to end.
-        const dataUrl = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
-        setPhotoUrl(dataUrl);
-      }
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Couldn't attach that photo");
-    } finally {
-      setPhotoUploading(false);
-    }
+    if (photoPreview) URL.revokeObjectURL(photoPreview);
+    setPhotoPreview(URL.createObjectURL(file));
   }
 
   return (
@@ -117,14 +94,12 @@ export function CookingMemoryForm({ recipeId, mealCardId, planId, dayIndex, defa
 
       <div>
         <label className={labelClass} htmlFor="photo">Photo</label>
-        <input type="hidden" name="photoUrl" value={photoUrl ?? ""} />
         <div className="flex items-center gap-3">
-          {photoUrl && (
+          {photoPreview && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={photoUrl} alt="" className="h-14 w-14 rounded-xl border border-line object-cover" />
+            <img src={photoPreview} alt="Selected cooking memory" className="h-14 w-14 rounded-xl border border-line object-cover" />
           )}
-          <input id="photo" type="file" accept="image/*" onChange={handlePhotoChange} className="text-xs text-ink-soft" />
-          {photoUploading && <span className="text-xs text-ink-soft">Uploading…</span>}
+          <input id="photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif" onChange={handlePhotoChange} className="text-xs text-ink-soft" />
         </div>
       </div>
 
@@ -166,7 +141,7 @@ export function CookingMemoryForm({ recipeId, mealCardId, planId, dayIndex, defa
         </div>
       </div>
 
-      <MutationFeedback feedback={error ? { tone: "error", message: error } : null} pending={isPending || photoUploading} pendingMessage={photoUploading ? "Uploading photo…" : "Saving memory…"} />
+      <MutationFeedback feedback={error ? { tone: "error", message: error } : null} pending={isPending} pendingMessage="Saving memory and photo…" />
       <Button type="submit" disabled={isPending}>{isPending ? "Saving…" : "Save memory"}</Button>
     </form>
   );

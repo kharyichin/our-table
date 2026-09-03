@@ -6,7 +6,6 @@ Effort guide: **S** = 1–3 hours, **M** = 4–8 hours, **L** = 1–3 focused da
 
 ### Next — harden the working household loop
 
-- [ ] **Audit webhook secrets and RLS policies** - verify household isolation, invitation access, service-role boundaries, and webhook rejection paths; depends on auth implementation; **L**
 
 ### Then — verification and launch readiness
 
@@ -18,6 +17,7 @@ Effort guide: **S** = 1–3 hours, **M** = 4–8 hours, **L** = 1–3 focused da
 
 ## Waiting On
 
+- [ ] **Configure Telegram credentials and public webhook** - add the bot token and a strong webhook secret, deploy or open a secure tunnel, then register and test the Telegram webhook
 - [ ] **Generate Supabase TypeScript definitions** - replace loosely typed row mapping after the finalized migrations are applied to the development project; **M**
 - [ ] **Confirm international-food artwork license tier** - free use requires visible rawpixel.com / Freepik attribution; premium terms differ
 
@@ -32,9 +32,11 @@ Effort guide: **S** = 1–3 hours, **M** = 4–8 hours, **L** = 1–3 focused da
 - [ ] **Finish the tactile illustration system** - richer member characters, photo-led memories, and less repetitive card composition
 - [ ] **Add advanced archive storytelling** - seasonal/year recaps and richer household food-history summaries after the MVP is reliable
 - [ ] **Add habit-driven merchant deals** - infer household ingredient patterns from cooking history, match current local merchant offers, and use them to shape next week's menu and shopping list; depends on reliable cooking history, normalized ingredients, store/location preferences, and licensed merchant feeds
+- [ ] **Generate universal memory-photo thumbnails** - preserve HEIC/HEIF originals from iPhone uploads while generating JPEG or WebP derivatives for consistent web previews; depends on the deployment image-processing strategy
 
 ## Done
 
+- [x] ~~Audit webhook secrets and RLS policies~~ (2026-09-02)
 - [x] ~~Create an implementation checkpoint~~ (2026-09-02)
 - [x] ~~Persist Telegram media safely~~ (2026-09-02)
 - [x] ~~Add Telegram household-linking UI~~ (2026-09-02)

@@ -6,6 +6,9 @@ import { createCookingMemory, type CookingMemoryInput } from "@/lib/data/cooking
 import { getDemoHouseholdId } from "@/lib/data/household";
 import type { RecipeStatus, WouldMakeAgain } from "@/lib/types";
 import { upsertMealCard } from "@/lib/data/weeklyPlans";
+import { getSupabaseServiceClient } from "@/lib/supabase/server";
+import { randomUUID } from "node:crypto";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
 
 function parseList(value: FormDataEntryValue | null): string[] {
   if (!value || typeof value !== "string") return [];
@@ -67,13 +70,46 @@ export async function createMemoryAction(formData: FormData) {
   const householdId = await getDemoHouseholdId();
   const wouldMakeAgain = String(formData.get("wouldMakeAgain") ?? "maybe");
   if (!["yes", "no", "maybe"].includes(wouldMakeAgain)) throw new Error("Choose whether you would make this again");
+  const recipeId = String(formData.get("recipeId"));
+  let photoUrl: string | null = null;
+  const photo = formData.get("photo");
+  if (photo instanceof File && photo.size > 0) {
+    const maxBytes = 10 * 1024 * 1024;
+    const extensions: Record<string, string> = {
+      "image/jpeg": "jpg",
+      "image/png": "png",
+      "image/webp": "webp",
+      "image/heic": "heic",
+      "image/heif": "heif",
+    };
+    const extension = extensions[photo.type];
+    if (!extension) throw new Error("Choose a JPEG, PNG, WebP, HEIC, or HEIF photo.");
+    if (photo.size > maxBytes) throw new Error("The photo must be smaller than 10 MB.");
+    const bytes = await photo.arrayBuffer();
+    if (isSupabaseConfigured()) {
+      const service = getSupabaseServiceClient();
+      if (!service) throw new Error("Photo storage is not configured.");
+      const { data: recipe } = await service.from("recipes").select("id").eq("id", recipeId).eq("household_id", householdId).maybeSingle();
+      if (!recipe) throw new Error("That recipe does not belong to this household.");
+      const objectPath = `${householdId}/${randomUUID()}.${extension}`;
+      const { error: uploadError } = await service.storage.from("memory-photos").upload(objectPath, bytes, {
+        contentType: photo.type,
+        cacheControl: "31536000",
+        upsert: false,
+      });
+      if (uploadError) throw new Error(`Photo upload failed: ${uploadError.message}`);
+      photoUrl = `/api/media/memory/${objectPath.split("/").map(encodeURIComponent).join("/")}`;
+    } else {
+      photoUrl = `data:${photo.type};base64,${Buffer.from(bytes).toString("base64")}`;
+    }
+  }
   const input: CookingMemoryInput = {
-    recipeId: String(formData.get("recipeId")),
+    recipeId,
     mealCardId: (formData.get("mealCardId") as string) || null,
     dateCooked: String(formData.get("dateCooked") ?? new Date().toISOString().slice(0, 10)),
     membersPresent: formData.getAll("membersPresent").map(String),
     note: (formData.get("note") as string) || null,
-    photoUrl: (formData.get("photoUrl") as string) || null,
+    photoUrl,
     rating: formData.get("rating") ? Number(formData.get("rating")) : null,
     wouldMakeAgain: wouldMakeAgain as WouldMakeAgain,
     changesMade: (formData.get("changesMade") as string) || null,
