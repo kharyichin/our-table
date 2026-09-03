@@ -11,6 +11,7 @@ import { planRecipeForDayAction } from "@/app/week/actions";
 import { DAY_LABELS_FULL } from "@/lib/types";
 import type { Recipe, RecipeStatus } from "@/lib/types";
 import { MutationFeedback, useMutationFeedback } from "@/components/ui/MutationFeedback";
+import { parseServingCount } from "@/lib/ingredients";
 
 const STATUS_OPTIONS: RecipeStatus[] = ["idea", "planned", "cooked", "repeated", "archived"];
 
@@ -28,6 +29,7 @@ export function RecipeDetailActions({
   const [logging, setLogging] = useState(false);
   const [planning, setPlanning] = useState(false);
   const [dayIndex, setDayIndex] = useState(0);
+  const [dinerCount, setDinerCount] = useState((parseServingCount(recipe.servings) ?? members.length) || 1);
   const { pending: isPending, feedback, run } = useMutationFeedback();
 
   return (
@@ -113,8 +115,19 @@ export function RecipeDetailActions({
               </button>
             ))}
           </div>
+          <label className="flex items-center justify-between gap-4 rounded-2xl bg-paper-warm px-4 py-3 text-sm font-semibold text-ink">
+            People eating
+            <input
+              type="number"
+              min={1}
+              max={50}
+              value={dinerCount}
+              onChange={(event) => setDinerCount(Number(event.target.value))}
+              className="w-16 rounded-xl border border-line bg-paper px-3 py-2 text-center"
+            />
+          </label>
           <Button disabled={isPending} onClick={() => run(async () => {
-            await planRecipeForDayAction(planId, recipe.id, dayIndex);
+            await planRecipeForDayAction(planId, recipe.id, dayIndex, dinerCount);
             setPlanning(false);
             router.push("/week");
           }, { success: "Recipe added to the week." })}>Plan for {DAY_LABELS_FULL[dayIndex]}</Button>

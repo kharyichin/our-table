@@ -24,6 +24,7 @@ function mapMealRow(row: any): MealCard {
     recipeId: row.recipe_id,
     state: row.state,
     note: row.note,
+    dinerCount: row.diner_count ?? null,
     createdAt: row.created_at,
   };
 }
@@ -120,7 +121,7 @@ export async function listMealCards(planId: string): Promise<MealCard[]> {
 export async function upsertMealCard(
   planId: string,
   dayIndex: number,
-  patch: { recipeId?: string | null; state?: MealState; note?: string | null }
+  patch: { recipeId?: string | null; state?: MealState; note?: string | null; dinerCount?: number | null }
 ): Promise<MealCard> {
   if (isSupabaseConfigured()) {
     const supabase = await getSupabaseServerClient();
@@ -137,6 +138,7 @@ export async function upsertMealCard(
       recipe_id: patch.recipeId !== undefined ? patch.recipeId : existing?.recipe_id ?? null,
       state: patch.state ?? existing?.state ?? "planned",
       note: patch.note !== undefined ? patch.note : existing?.note ?? null,
+      diner_count: patch.dinerCount !== undefined ? patch.dinerCount : existing?.diner_count ?? null,
     };
 
     if (existing) {
@@ -157,6 +159,7 @@ export async function upsertMealCard(
       recipeId: null,
       state: "planned",
       note: null,
+      dinerCount: null,
       createdAt: new Date().toISOString(),
     };
     demoStore.mealCards.push(card);
@@ -164,7 +167,17 @@ export async function upsertMealCard(
   if (patch.recipeId !== undefined) card.recipeId = patch.recipeId;
   if (patch.state !== undefined) card.state = patch.state;
   if (patch.note !== undefined) card.note = patch.note;
+  if (patch.dinerCount !== undefined) card.dinerCount = patch.dinerCount;
   return card;
+}
+
+export async function getMealCard(id: string): Promise<MealCard | null> {
+  if (isSupabaseConfigured()) {
+    const supabase = await getSupabaseServerClient();
+    const { data } = await supabase!.from("meal_cards").select("*").eq("id", id).maybeSingle();
+    return data ? mapMealRow(data) : null;
+  }
+  return demoStore.mealCards.find((card) => card.id === id) ?? null;
 }
 
 export async function clearMealCard(planId: string, dayIndex: number): Promise<void> {

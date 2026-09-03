@@ -297,13 +297,13 @@ export const MEAL_THU = "mc-thu";
 export const MEAL_SAT = "mc-sat";
 
 export const demoMealCards: MealCard[] = [
-  { id: MEAL_MON, weeklyPlanId: DEMO_PLAN_ID, dayIndex: 0, recipeId: RECIPE_TACOS, state: "cooked", note: null, createdAt: isoDateTime(weekStart) },
-  { id: MEAL_TUE, weeklyPlanId: DEMO_PLAN_ID, dayIndex: 1, recipeId: RECIPE_SAUCE, state: "planned", note: null, createdAt: isoDateTime(weekStart) },
-  { id: "mc-wed", weeklyPlanId: DEMO_PLAN_ID, dayIndex: 2, recipeId: null, state: "eating_out", note: "Date night at Luna's", createdAt: isoDateTime(weekStart) },
-  { id: MEAL_THU, weeklyPlanId: DEMO_PLAN_ID, dayIndex: 3, recipeId: RECIPE_FRIEDRICE, state: "planned", note: null, createdAt: isoDateTime(weekStart) },
-  { id: "mc-fri", weeklyPlanId: DEMO_PLAN_ID, dayIndex: 4, recipeId: RECIPE_SALMON, state: "replaced", note: "Swapped for leftovers, too tired to cook", createdAt: isoDateTime(weekStart) },
-  { id: MEAL_SAT, weeklyPlanId: DEMO_PLAN_ID, dayIndex: 5, recipeId: RECIPE_KATSU, state: "planned", note: null, createdAt: isoDateTime(weekStart) },
-  { id: "mc-sun", weeklyPlanId: DEMO_PLAN_ID, dayIndex: 6, recipeId: null, state: "skipped", note: "Potluck at the Kims' — bringing dessert instead", createdAt: isoDateTime(weekStart) },
+  { id: MEAL_MON, weeklyPlanId: DEMO_PLAN_ID, dayIndex: 0, recipeId: RECIPE_TACOS, state: "cooked", note: null, dinerCount: 2, createdAt: isoDateTime(weekStart) },
+  { id: MEAL_TUE, weeklyPlanId: DEMO_PLAN_ID, dayIndex: 1, recipeId: RECIPE_SAUCE, state: "planned", note: null, dinerCount: 4, createdAt: isoDateTime(weekStart) },
+  { id: "mc-wed", weeklyPlanId: DEMO_PLAN_ID, dayIndex: 2, recipeId: null, state: "eating_out", note: "Date night at Luna's", dinerCount: null, createdAt: isoDateTime(weekStart) },
+  { id: MEAL_THU, weeklyPlanId: DEMO_PLAN_ID, dayIndex: 3, recipeId: RECIPE_FRIEDRICE, state: "planned", note: null, dinerCount: 2, createdAt: isoDateTime(weekStart) },
+  { id: "mc-fri", weeklyPlanId: DEMO_PLAN_ID, dayIndex: 4, recipeId: RECIPE_SALMON, state: "replaced", note: "Swapped for leftovers, too tired to cook", dinerCount: 2, createdAt: isoDateTime(weekStart) },
+  { id: MEAL_SAT, weeklyPlanId: DEMO_PLAN_ID, dayIndex: 5, recipeId: RECIPE_KATSU, state: "planned", note: null, dinerCount: 3, createdAt: isoDateTime(weekStart) },
+  { id: "mc-sun", weeklyPlanId: DEMO_PLAN_ID, dayIndex: 6, recipeId: null, state: "skipped", note: "Potluck at the Kims' — bringing dessert instead", dinerCount: null, createdAt: isoDateTime(weekStart) },
 ];
 
 export const demoShoppingList: ShoppingList = {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mergeIngredientQuantities, normalizeIngredientKey, parseIngredientLine, parseIngredientText } from "@/lib/ingredients";
+import { mergeIngredientQuantities, normalizeIngredientKey, parseIngredientLine, parseIngredientText, parseServingCount, scaleIngredientLine } from "@/lib/ingredients";
 
 describe("ingredient parsing", () => {
   it("normalizes preparation words and plural forms", () => {
@@ -35,5 +35,18 @@ describe("ingredient parsing", () => {
       "½ onion (4 oz, 113 g; peeled)",
       "10 oz boneless, skinless chicken thighs",
     ]);
+  });
+
+  it("reads simple recipe yields", () => {
+    expect(parseServingCount("Serves 4")).toBe(4);
+    expect(parseServingCount("2 servings")).toBe(2);
+    expect(parseServingCount("4-6 servings")).toBeNull();
+  });
+
+  it("scales only safe leading quantities", () => {
+    expect(scaleIngredientLine("2 chicken thighs", 0.5)).toBe("1 chicken thighs");
+    expect(scaleIngredientLine("½ cup rice", 2)).toBe("1 cup rice");
+    expect(scaleIngredientLine("1 can (14 oz) tomatoes", 2)).toBe("1 can (14 oz) tomatoes");
+    expect(scaleIngredientLine("Salt to taste", 2)).toBe("Salt to taste");
   });
 });

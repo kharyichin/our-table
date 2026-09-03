@@ -10,8 +10,9 @@ import { Tag } from "@/components/ui/Tag";
 import { RecipeDetailActions } from "@/components/recipes/RecipeDetailActions";
 import { MemoryCard } from "@/components/memories/MemoryCard";
 import { formatDate } from "@/lib/utils";
-import { getOrCreateCurrentWeeklyPlan } from "@/lib/data/weeklyPlans";
+import { getMealCard, getOrCreateCurrentWeeklyPlan } from "@/lib/data/weeklyPlans";
 import { RecipeReadingView } from "@/components/recipes/RecipeReadingView";
+import { parseServingCount, scaleIngredientLine } from "@/lib/ingredients";
 
 function servingLabel(value: string): string {
   const yieldText = value.trim();
@@ -19,8 +20,12 @@ function servingLabel(value: string): string {
   return `Serves ${yieldText}`;
 }
 
-export default async function RecipeDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function RecipeDetailPage({ params, searchParams }: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ meal?: string }>;
+}) {
   const { id } = await params;
+  const { meal: mealId } = await searchParams;
   const recipe = await getRecipe(id);
   if (!recipe) notFound();
 
@@ -33,6 +38,10 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
   const profiles = members.map((m) => m.profile).filter((p): p is NonNullable<typeof p> => Boolean(p));
   const discoveredByProfile = recipe.discoveredBy ? (await getProfiles([recipe.discoveredBy]))[0] : null;
   const relatedFinds = groceryFinds.filter((g) => g.relatedRecipeIds.includes(id));
+  const meal = mealId ? await getMealCard(mealId) : null;
+  const baseServings = parseServingCount(recipe.servings);
+  const dinerFactor = meal?.recipeId === recipe.id && meal.dinerCount && baseServings ? meal.dinerCount / baseServings : 1;
+  const displayedIngredients = recipe.ingredients.map((ingredient) => scaleIngredientLine(ingredient, dinerFactor));
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 lg:px-10 lg:py-12">
@@ -75,6 +84,7 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
           </p>
           <div className="mt-3 flex flex-wrap gap-1.5">
             {recipe.servings && <span className="rounded-full border border-line bg-paper-warm px-3 py-1 text-xs font-bold text-ink">{servingLabel(recipe.servings)}</span>}
+            {dinerFactor !== 1 && meal?.dinerCount && <span className="rounded-full bg-tomato px-3 py-1 text-xs font-bold text-white">Adjusted for {meal.dinerCount}</span>}
             {recipe.cuisineTags.map((t) => <Tag key={t} variant="cuisine">#{t}</Tag>)}
             {recipe.ingredientTags.map((t) => <Tag key={t} variant="ingredient">#{t}</Tag>)}
           </div>
@@ -89,7 +99,7 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
         />
       </div>
 
-      <RecipeReadingView ingredients={recipe.ingredients} instructions={recipe.instructions} />
+      <RecipeReadingView ingredients={displayedIngredients} instructions={recipe.instructions} />
 
       {relatedFinds.length > 0 && (
         <section className="mt-6">

@@ -23,6 +23,50 @@ const FRACTIONS: Record<string, string> = {
   "⅞": "7/8",
 };
 
+export function parseServingCount(value: string | null): number | null {
+  if (!value) return null;
+  const normalized = value.trim().replace(/^serves?\s+/i, "").replace(/\s+(servings?|people|persons?|portions?)$/i, "");
+  if (!/^\d+(?:\.\d+)?$/.test(normalized)) return null;
+  const count = Number(normalized);
+  return Number.isFinite(count) && count > 0 ? count : null;
+}
+
+function parseAmount(value: string): number | null {
+  const unicode = FRACTIONS[value];
+  const normalized = unicode ?? value;
+  const parts = normalized.split(/\s+/);
+  let total = 0;
+  for (const part of parts) {
+    if (part.includes("/")) {
+      const [numerator, denominator] = part.split("/").map(Number);
+      if (!denominator) return null;
+      total += numerator / denominator;
+    } else {
+      const number = Number(part);
+      if (!Number.isFinite(number)) return null;
+      total += number;
+    }
+  }
+  return total;
+}
+
+function formatScaledAmount(value: number): string {
+  const rounded = Math.round(value * 8) / 8;
+  const whole = Math.floor(rounded);
+  const fraction = Math.round((rounded - whole) * 8);
+  const labels: Record<number, string> = { 1: "⅛", 2: "¼", 3: "⅜", 4: "½", 5: "⅝", 6: "¾", 7: "⅞" };
+  if (fraction === 0) return String(whole);
+  return `${whole || ""}${labels[fraction]}`;
+}
+
+export function scaleIngredientLine(raw: string, factor: number): string {
+  if (!Number.isFinite(factor) || factor <= 0 || Math.abs(factor - 1) < 0.001) return raw;
+  const match = raw.match(/^(\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?|[¼½¾⅓⅔⅛⅜⅝⅞])(\s+)(.+)$/);
+  if (!match || /\d/.test(match[3])) return raw;
+  const amount = parseAmount(match[1]);
+  return amount === null ? raw : `${formatScaledAmount(amount * factor)}${match[2]}${match[3]}`;
+}
+
 const UNIT_ALIASES: Record<string, string> = {
   c: "cup",
   cup: "cup",

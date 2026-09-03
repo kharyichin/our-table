@@ -6,7 +6,6 @@ Effort guide: **S** = 1–3 hours, **M** = 4–8 hours, **L** = 1–3 focused da
 
 ### Next — harden the working household loop
 
-- [ ] **Scale recipe quantities for the planned diners** - store a structured base yield, let a household choose how many people are eating that meal, and recalculate only quantities that can be parsed safely; preserve the original wording as a fallback; **M**
 
 ### Then — verification and launch readiness
 
@@ -31,6 +30,7 @@ Effort guide: **S** = 1–3 hours, **M** = 4–8 hours, **L** = 1–3 focused da
 
 ## Done
 
+- [x] ~~Scale recipe quantities for the planned diners~~ (2026-09-03)
 - [x] ~~Configure and verify Telegram capture in production~~ (2026-09-03)
 - [x] ~~Make saved recipes scannable with serving yield, ingredient checks, and readable steps~~ (2026-09-03)
 - [x] ~~Import structured ingredients and instructions from recipe links~~ (2026-09-03)

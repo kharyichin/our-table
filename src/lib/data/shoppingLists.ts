@@ -5,7 +5,7 @@ import { demoStore, nextId } from "./store";
 import type { ShoppingItem, ShoppingList } from "@/lib/types";
 import { listMealCards } from "./weeklyPlans";
 import { getRecipe } from "./recipes";
-import { mergeIngredientQuantities, normalizeIngredientKey, parseIngredientLine } from "@/lib/ingredients";
+import { mergeIngredientQuantities, normalizeIngredientKey, parseIngredientLine, parseServingCount, scaleIngredientLine } from "@/lib/ingredients";
 
 function mapListRow(row: any): ShoppingList {
   return { id: row.id, weeklyPlanId: row.weekly_plan_id, generatedAt: row.generated_at };
@@ -103,8 +103,10 @@ export async function regenerateShoppingList(planId: string): Promise<ShoppingIt
     const card = relevantCards[cardIndex];
     const recipe = recipes[cardIndex];
     if (!recipe) continue;
+    const baseServings = parseServingCount(recipe.servings);
+    const factor = card.dinerCount && baseServings ? card.dinerCount / baseServings : 1;
     for (const rawIngredient of recipe.ingredients) {
-      const parsed = parseIngredientLine(rawIngredient);
+      const parsed = parseIngredientLine(scaleIngredientLine(rawIngredient, factor));
       if (!parsed?.key) continue;
       const existing = merged.get(parsed.key);
       if (existing) {

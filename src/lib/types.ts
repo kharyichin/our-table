@@ -106,6 +106,7 @@ export interface MealCard {
   recipeId: string | null;
   state: MealState;
   note: string | null;
+  dinerCount: number | null;
   createdAt: string;
 }
 

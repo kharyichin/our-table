@@ -4,13 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { DishIllustration } from "@/components/illustrations/FoodIllustration";
-import { setMealRecipeAction, setMealStateAction, setMealNoteAction } from "@/app/week/actions";
+import { setMealRecipeAction, setMealStateAction, setMealNoteAction, setMealDinerCountAction } from "@/app/week/actions";
 import { DAY_LABELS_FULL } from "@/lib/types";
 import { formatMonthDay, cn } from "@/lib/utils";
 import type { MealCard, MealState, Recipe } from "@/lib/types";
 import { Modal } from "@/components/ui/Modal";
 import { CookingMemoryForm } from "@/components/memories/CookingMemoryForm";
 import { MutationFeedback, useMutationFeedback } from "@/components/ui/MutationFeedback";
+import { parseServingCount } from "@/lib/ingredients";
 
 const STATE_LABEL: Record<MealState, string> = {
   planned: "Planned",
@@ -48,6 +49,7 @@ export function DayCard({
   const router = useRouter();
   const { pending: isPending, feedback, run } = useMutationFeedback();
   const [note, setNote] = useState(card?.note ?? "");
+  const [dinerCount, setDinerCount] = useState((card?.dinerCount ?? members.length) || 1);
   const [logging, setLogging] = useState(false);
 
   const recipe = card?.recipeId ? recipes.find((r) => r.id === card.recipeId) : null;
@@ -63,7 +65,7 @@ export function DayCard({
         await setMealRecipeAction(planId, dayIndex, null);
         await setMealStateAction(planId, dayIndex, value);
       } else {
-        await setMealRecipeAction(planId, dayIndex, value);
+        await setMealRecipeAction(planId, dayIndex, value, dinerCount);
       }
       router.refresh();
     }, { success: "Meal plan updated." });
@@ -82,7 +84,7 @@ export function DayCard({
       </div>
 
       {hasRecipe && recipe ? (
-        <Link href={`/recipes/${recipe.id}`} className="mb-2 flex items-center gap-2 rounded-xl p-1 hover:bg-paper-warm/60">
+        <Link href={`/recipes/${recipe.id}?meal=${card?.id}`} className="mb-2 flex items-center gap-2 rounded-xl p-1 hover:bg-paper-warm/60">
           <DishIllustration seed={recipe.illustrationSeed} tags={[...recipe.ingredientTags, ...recipe.cuisineTags]} className="h-11 w-11 shrink-0" />
           <span className="text-sm font-semibold leading-tight text-ink">{recipe.title}</span>
         </Link>
@@ -109,6 +111,32 @@ export function DayCard({
       </select>
 
       {hasRecipe && (
+        <>
+        <div className="mb-2 flex items-center justify-between gap-2 rounded-xl bg-paper-warm/70 px-3 py-2">
+          <span className="text-[11px] text-ink-soft">
+            {recipe?.servings ? `Recipe serves ${parseServingCount(recipe.servings) ?? recipe.servings}` : "Set for this meal"}
+          </span>
+          <label className="flex items-center gap-2 text-[11px] font-semibold text-ink">
+            Cooking for
+            <input
+              type="number"
+              min={1}
+              max={50}
+              value={dinerCount}
+              disabled={isPending}
+              onChange={(event) => setDinerCount(Number(event.target.value))}
+              onBlur={() => {
+                const nextCount = Number.isInteger(dinerCount) && dinerCount > 0 ? dinerCount : 1;
+                setDinerCount(nextCount);
+                run(async () => {
+                await setMealDinerCountAction(planId, dayIndex, nextCount);
+                router.refresh();
+                }, { success: "Diner count and shopping amounts updated." });
+              }}
+              className="w-12 rounded-lg border border-line bg-paper px-2 py-1 text-center text-xs"
+            />
+          </label>
+        </div>
         <div className="mb-2 flex flex-wrap gap-1.5">
           {(["planned", "cooked", "replaced"] as MealState[]).map((s) => (
             <button
@@ -135,6 +163,7 @@ export function DayCard({
             </button>
           )}
         </div>
+        </>
       )}
 
       <input
