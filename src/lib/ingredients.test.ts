@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mergeIngredientQuantities, normalizeIngredientKey, parseIngredientLine } from "@/lib/ingredients";
+import { mergeIngredientQuantities, normalizeIngredientKey, parseIngredientLine, parseIngredientText } from "@/lib/ingredients";
 
 describe("ingredient parsing", () => {
   it("normalizes preparation words and plural forms", () => {
@@ -28,5 +28,12 @@ describe("ingredient parsing", () => {
     expect(mergeIngredientQuantities("1 cup", "1/2 cup")).toBe("1.5 cup");
     expect(mergeIngredientQuantities("2 lb", "8 oz")).toBe("2 lb + 8 oz");
     expect(mergeIngredientQuantities("1 bunch", "1 bunch")).toBe("1 bunch");
+  });
+
+  it("keeps commas inside a single ingredient", () => {
+    expect(parseIngredientText("½ onion (4 oz, 113 g; peeled)\n10 oz boneless, skinless chicken thighs")).toEqual([
+      "½ onion (4 oz, 113 g; peeled)",
+      "10 oz boneless, skinless chicken thighs",
+    ]);
   });
 });

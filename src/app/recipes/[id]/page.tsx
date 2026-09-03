@@ -13,6 +13,12 @@ import { formatDate } from "@/lib/utils";
 import { getOrCreateCurrentWeeklyPlan } from "@/lib/data/weeklyPlans";
 import { RecipeReadingView } from "@/components/recipes/RecipeReadingView";
 
+function servingLabel(value: string): string {
+  const yieldText = value.trim();
+  if (/^serves\b/i.test(yieldText) || /\b(servings?|people|persons?|portions?)\b/i.test(yieldText)) return yieldText;
+  return `Serves ${yieldText}`;
+}
+
 export default async function RecipeDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const recipe = await getRecipe(id);
@@ -68,7 +74,7 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
             )}
           </p>
           <div className="mt-3 flex flex-wrap gap-1.5">
-            {recipe.servings && <span className="rounded-full border border-line bg-paper-warm px-3 py-1 text-xs font-bold text-ink">{recipe.servings}</span>}
+            {recipe.servings && <span className="rounded-full border border-line bg-paper-warm px-3 py-1 text-xs font-bold text-ink">{servingLabel(recipe.servings)}</span>}
             {recipe.cuisineTags.map((t) => <Tag key={t} variant="cuisine">#{t}</Tag>)}
             {recipe.ingredientTags.map((t) => <Tag key={t} variant="ingredient">#{t}</Tag>)}
           </div>

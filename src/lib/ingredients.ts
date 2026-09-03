@@ -4,6 +4,13 @@ export interface ParsedIngredient {
   key: string;
 }
 
+export function parseIngredientText(value: string): string[] {
+  return value
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
 const FRACTIONS: Record<string, string> = {
   "¼": "1/4",
   "½": "1/2",

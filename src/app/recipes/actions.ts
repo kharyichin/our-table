@@ -11,8 +11,9 @@ import { randomUUID } from "node:crypto";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { getRecipe } from "@/lib/data/recipes";
 import { importRecipeFromUrl } from "@/lib/recipeImport";
+import { parseIngredientText } from "@/lib/ingredients";
 
-function parseList(value: FormDataEntryValue | null): string[] {
+function parseTagList(value: FormDataEntryValue | null): string[] {
   if (!value || typeof value !== "string") return [];
   return value
     .split(/[\n,]/)
@@ -26,10 +27,10 @@ function buildRecipeInput(formData: FormData): RecipeInput {
     sourceUrl: (formData.get("sourceUrl") as string) || null,
     description: (formData.get("description") as string) || null,
     servings: (formData.get("servings") as string) || null,
-    ingredients: parseList(formData.get("ingredients")),
+    ingredients: parseIngredientText(String(formData.get("ingredients") ?? "")),
     instructions: (formData.get("instructions") as string) || null,
-    cuisineTags: parseList(formData.get("cuisineTags")).map((t) => t.replace(/^#/, "").toLowerCase()),
-    ingredientTags: parseList(formData.get("ingredientTags")).map((t) => t.replace(/^#/, "").toLowerCase()),
+    cuisineTags: parseTagList(formData.get("cuisineTags")).map((t) => t.replace(/^#/, "").toLowerCase()),
+    ingredientTags: parseTagList(formData.get("ingredientTags")).map((t) => t.replace(/^#/, "").toLowerCase()),
   };
 }
 

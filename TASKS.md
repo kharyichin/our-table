@@ -6,6 +6,7 @@ Effort guide: **S** = 1–3 hours, **M** = 4–8 hours, **L** = 1–3 focused da
 
 ### Next — harden the working household loop
 
+- [ ] **Scale recipe quantities for the planned diners** - store a structured base yield, let a household choose how many people are eating that meal, and recalculate only quantities that can be parsed safely; preserve the original wording as a fallback; **M**
 
 ### Then — verification and launch readiness
 
@@ -13,7 +14,6 @@ Effort guide: **S** = 1–3 hours, **M** = 4–8 hours, **L** = 1–3 focused da
 ## Waiting On
 
 - [ ] **Add data-layer integration tests** - household isolation, invitations, shopping regeneration, memory creation, and Telegram idempotency; requires an isolated test Supabase URL, publishable key, and service-role key so fixtures cannot affect development data; **L**
-- [ ] **Configure Telegram credentials and public webhook** - add the bot token and a strong webhook secret, deploy or open a secure tunnel, then register and test the Telegram webhook
 - [ ] **Generate Supabase TypeScript definitions** - replace loosely typed row mapping after the finalized migrations are applied to the development project; **M**
 - [ ] **Confirm international-food artwork license tier** - free use requires visible rawpixel.com / Freepik attribution; premium terms differ
 
@@ -31,6 +31,7 @@ Effort guide: **S** = 1–3 hours, **M** = 4–8 hours, **L** = 1–3 focused da
 
 ## Done
 
+- [x] ~~Configure and verify Telegram capture in production~~ (2026-09-03)
 - [x] ~~Make saved recipes scannable with serving yield, ingredient checks, and readable steps~~ (2026-09-03)
 - [x] ~~Import structured ingredients and instructions from recipe links~~ (2026-09-03)
 - [x] ~~Allow every household member to manage the Telegram connection~~ (2026-09-03)
