@@ -3,6 +3,7 @@ import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { demoStore, nextId } from "./store";
 import type { MealCard, MealState, WeeklyPlan } from "@/lib/types";
+import { weekStartIso, weekStartIsoForDate } from "@/lib/week";
 
 function mapPlanRow(row: any): WeeklyPlan {
   return {
@@ -27,23 +28,13 @@ function mapMealRow(row: any): MealCard {
   };
 }
 
-function startOfWeek(d: Date): Date {
-  const day = d.getDay();
-  const diff = (day === 0 ? -6 : 1) - day;
-  const monday = new Date(d);
-  monday.setDate(d.getDate() + diff);
-  monday.setHours(0, 0, 0, 0);
-  return monday;
-}
-
 export async function getOrCreateCurrentWeeklyPlan(householdId: string): Promise<WeeklyPlan> {
-  const weekStartDate = startOfWeek(new Date()).toISOString().slice(0, 10);
+  const weekStartDate = weekStartIso(new Date());
   return getOrCreateWeeklyPlanForDate(householdId, weekStartDate);
 }
 
 export async function getOrCreateWeeklyPlanForDate(householdId: string, date: string): Promise<WeeklyPlan> {
-  const parsed = new Date(`${date}T12:00:00`);
-  const weekStartDate = startOfWeek(Number.isNaN(parsed.getTime()) ? new Date() : parsed).toISOString().slice(0, 10);
+  const weekStartDate = weekStartIsoForDate(date);
 
   if (isSupabaseConfigured()) {
     const supabase = await getSupabaseServerClient();

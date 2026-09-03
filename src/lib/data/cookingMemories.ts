@@ -4,6 +4,7 @@ import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { demoStore, nextId } from "./store";
 import type { CookingMemory, WouldMakeAgain } from "@/lib/types";
 import { setRecipeStatus, getRecipe } from "./recipes";
+import { recipeStatusAfterCooking } from "@/lib/recipeStatus";
 
 function mapRow(row: any): CookingMemory {
   return {
@@ -117,8 +118,8 @@ export async function createCookingMemory(
   const recipe = await getRecipe(input.recipeId);
   if (recipe) {
     const priorMemories = await listCookingMemoriesForRecipe(input.recipeId);
-    const nextStatus = priorMemories.length > 1 ? "repeated" : "cooked";
-    if (recipe.status !== "archived") await setRecipeStatus(input.recipeId, nextStatus);
+    const nextStatus = recipeStatusAfterCooking(recipe.status, priorMemories.length);
+    if (nextStatus !== recipe.status) await setRecipeStatus(input.recipeId, nextStatus);
   }
 
   return memory;
