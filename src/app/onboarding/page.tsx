@@ -2,8 +2,10 @@ import { redirect } from "next/navigation";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { SignOutButton } from "@/components/auth/SignOutButton";
 import { OnboardingForm } from "@/components/auth/OnboardingForm";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
 
 export default async function OnboardingPage() {
+  if (!isSupabaseConfigured()) redirect("/home");
   const supabase = await getSupabaseServerClient();
   const { data: { user } } = await supabase!.auth.getUser();
   if (!user) redirect("/sign-in");

@@ -9,7 +9,6 @@ Effort guide: **S** = 1–3 hours, **M** = 4–8 hours, **L** = 1–3 focused da
 
 ### Then — verification and launch readiness
 
-- [ ] **Add the core end-to-end test** - capture → review → plan → shop → cook → memory → archive; depends on stable auth and routes; **L**
 
 ## Waiting On
 
@@ -33,6 +32,7 @@ Effort guide: **S** = 1–3 hours, **M** = 4–8 hours, **L** = 1–3 focused da
 
 ## Done
 
+- [x] ~~Add the core end-to-end test~~ (2026-09-03)
 - [x] ~~Verify responsive PWA behavior~~ (2026-09-03)
 - [x] ~~Add domain unit tests~~ (2026-09-03)
 - [x] ~~Add route loading and error states~~ (2026-09-03)

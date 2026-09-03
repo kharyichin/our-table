@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 
 export function Modal({
@@ -31,7 +32,7 @@ export function Modal({
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-0 sm:items-center sm:p-4" onClick={onClose}>
       <div
         className={cn(
@@ -52,6 +53,7 @@ export function Modal({
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
