@@ -5,7 +5,7 @@ import { getSupabaseServerClient, getSupabaseServiceClient } from "@/lib/supabas
 import { updateProfileFoodPreferences } from "@/lib/data/household";
 import { createHash, randomBytes } from "node:crypto";
 
-async function requireOwner(householdId: string) {
+async function requireHouseholdMember(householdId: string) {
   const supabase = await getSupabaseServerClient();
   const { data: { user } } = await supabase!.auth.getUser();
   if (!user) throw new Error("Your session expired. Sign in again.");
@@ -15,10 +15,16 @@ async function requireOwner(householdId: string) {
     .eq("household_id", householdId)
     .eq("profile_id", user.id)
     .maybeSingle();
-  if (membership?.role !== "owner") throw new Error("Only the household owner can do that.");
+  if (!membership) throw new Error("You must belong to this household to do that.");
   const service = getSupabaseServiceClient();
   if (!service) throw new Error("Server configuration is incomplete.");
-  return { service, user };
+  return { service, user, membership };
+}
+
+async function requireOwner(householdId: string) {
+  const context = await requireHouseholdMember(householdId);
+  if (context.membership.role !== "owner") throw new Error("Only the household owner can do that.");
+  return context;
 }
 
 export async function updateHouseholdNameAction(householdId: string, name: string) {
@@ -65,7 +71,7 @@ export async function removeHouseholdMemberAction(householdId: string, memberId:
 }
 
 export async function createTelegramLinkCodeAction(householdId: string): Promise<{ command: string }> {
-  const { service, user } = await requireOwner(householdId);
+  const { service, user } = await requireHouseholdMember(householdId);
   const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   const bytes = randomBytes(8);
   const token = Array.from(bytes, (byte) => alphabet[byte % alphabet.length]).join("");
@@ -83,7 +89,7 @@ export async function createTelegramLinkCodeAction(householdId: string): Promise
 }
 
 export async function disconnectTelegramAction(householdId: string): Promise<void> {
-  const { service } = await requireOwner(householdId);
+  const { service } = await requireHouseholdMember(householdId);
   const { error } = await service.from("telegram_links").delete().eq("household_id", householdId);
   if (error) throw new Error(error.message);
   await service.from("telegram_link_tokens").delete().eq("household_id", householdId);

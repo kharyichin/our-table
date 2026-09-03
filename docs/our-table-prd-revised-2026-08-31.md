@@ -77,13 +77,13 @@ Our Table should make capture nearly effortless, turn discoveries into a practic
 
 - Creates the household.
 - Invites and removes members.
-- Connects or disconnects Telegram.
 - Edits shared household content.
 
 ### Household member
 
 - Joins through an invitation.
 - Captures, plans, shops, and records memories.
+- Connects or disconnects the household Telegram group.
 - Edits their profile and food preferences.
 
 ### Access rules

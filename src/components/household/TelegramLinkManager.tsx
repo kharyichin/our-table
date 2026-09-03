@@ -87,7 +87,7 @@ export function TelegramLinkManager({ householdId, link, canManage, botUsername 
           </div>
         </div>
       ) : (
-        <p className="mt-3 text-xs text-ink-soft">The household owner can connect a Telegram group.</p>
+        <p className="mt-3 text-xs text-ink-soft">Join this household to connect its Telegram group.</p>
       )}
       <MutationFeedback feedback={feedback} pending={pending} pendingMessage="Preparing the connection…" className="mt-3" />
     </div>

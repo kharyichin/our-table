@@ -23,6 +23,7 @@ export default async function HouseholdSettingsPage() {
   const { data: { user } } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
   const currentMember = members.find((member) => member.profileId === user?.id);
   const isOwner = currentMember?.role === "owner";
+  const canManageTelegram = Boolean(currentMember);
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 lg:px-10 lg:py-12">
@@ -73,7 +74,7 @@ export default async function HouseholdSettingsPage() {
         <TelegramLinkManager
           householdId={household.id}
           link={telegramLink}
-          canManage={isOwner}
+          canManage={canManageTelegram}
           botUsername={process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME?.replace(/^@/, "") ?? null}
         />
         <p className="mt-3 text-xs text-ink-soft">
