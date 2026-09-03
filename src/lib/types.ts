@@ -56,6 +56,7 @@ export interface Recipe {
   sourceUrl: string | null;
   description: string | null;
   servings: string | null;
+  sourceImageUrl: string | null;
   ingredients: string[];
   instructions: string | null;
   cuisineTags: string[];

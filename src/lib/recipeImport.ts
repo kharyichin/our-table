@@ -8,6 +8,7 @@ export interface ImportedRecipe {
   title: string | null;
   description: string | null;
   servings: string | null;
+  imageUrl: string | null;
   ingredients: string[];
   instructions: string | null;
 }
@@ -33,6 +34,18 @@ function objectsIn(value: unknown): JsonObject[] {
 function isRecipeNode(node: JsonObject): boolean {
   const type = node["@type"];
   return (Array.isArray(type) ? type : [type]).some((item) => String(item).toLowerCase() === "recipe");
+}
+
+function imageUrl(value: unknown): string | null {
+  const candidate = Array.isArray(value) ? value[0] : value;
+  const raw = typeof candidate === "string" ? candidate : candidate && typeof candidate === "object" ? (candidate as JsonObject).url : null;
+  if (typeof raw !== "string") return null;
+  try {
+    const url = new URL(raw);
+    return ["http:", "https:"].includes(url.protocol) ? url.toString() : null;
+  } catch {
+    return null;
+  }
 }
 
 function instructionLines(value: unknown): string[] {
@@ -61,6 +74,7 @@ export function extractRecipeFromHtml(html: string): ImportedRecipe | null {
         title: typeof node.name === "string" ? decodeHtmlEntities(node.name.trim()) || null : null,
         description: typeof node.description === "string" ? decodeHtmlEntities(node.description.trim()) || null : null,
         servings: rawYield === undefined || rawYield === null ? null : decodeHtmlEntities(String(rawYield).trim()) || null,
+        imageUrl: imageUrl(node.image),
         ingredients,
         instructions: steps.length ? steps.map((step, index) => `${index + 1}. ${step}`).join("\n\n") : null,
       };

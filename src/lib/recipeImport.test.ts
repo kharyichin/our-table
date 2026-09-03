@@ -9,6 +9,7 @@ describe("extractRecipeFromHtml", () => {
         name: "Nami&#39;s Oyakodon",
         description: "Chicken &amp; egg rice bowl",
         recipeYield: "2 servings",
+        image: { url: "https://example.com/oyakodon.jpg" },
         recipeIngredient: ["2 chicken thighs", "3 eggs"],
         recipeInstructions: [{ "@type": "HowToStep", text: "Simmer the chicken." }, { "@type": "HowToStep", text: "Add the eggs." }],
       }],
@@ -17,6 +18,7 @@ describe("extractRecipeFromHtml", () => {
       title: "Nami's Oyakodon",
       description: "Chicken & egg rice bowl",
       servings: "2 servings",
+      imageUrl: "https://example.com/oyakodon.jpg",
       ingredients: ["2 chicken thighs", "3 eggs"],
       instructions: "1. Simmer the chicken.\n\n2. Add the eggs.",
     });

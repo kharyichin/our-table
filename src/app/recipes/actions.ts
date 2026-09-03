@@ -68,6 +68,7 @@ export async function importRecipeFromSourceAction(id: string) {
     title: imported.title ?? recipe.title,
     description: imported.description ?? recipe.description,
     servings: imported.servings ?? recipe.servings,
+    sourceImageUrl: imported.imageUrl ?? recipe.sourceImageUrl,
     ingredients: imported.ingredients.length ? imported.ingredients : recipe.ingredients,
     instructions: imported.instructions ?? recipe.instructions,
   });

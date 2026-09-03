@@ -156,6 +156,7 @@ export async function POST(req: NextRequest) {
       sourceUrl: urls[0] ?? null,
       description: imported?.description ?? (messageLink ? "Captured from Telegram." : null),
       servings: imported?.servings ?? null,
+      sourceImageUrl: imported?.imageUrl ?? null,
       ingredients: imported?.ingredients ?? [],
       instructions: imported?.instructions ?? null,
       cuisineTags: recipeTags.cuisineTags,

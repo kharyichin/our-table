@@ -35,11 +35,20 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
       </Link>
 
       <div className="paper-card paper-stack mb-6 flex flex-col gap-5 p-6 sm:flex-row">
-        <DishIllustration
-          seed={recipe.illustrationSeed}
-          tags={[...recipe.ingredientTags, ...recipe.cuisineTags]}
-          className="h-28 w-28 shrink-0 self-start"
-        />
+        {recipe.sourceImageUrl ? (
+          <div
+            role="img"
+            aria-label={recipe.title}
+            className="h-44 w-full shrink-0 rounded-[1.5rem] bg-paper-warm bg-cover bg-center shadow-[inset_0_0_0_1px_var(--color-line)] sm:h-36 sm:w-44"
+            style={{ backgroundImage: `url(${JSON.stringify(recipe.sourceImageUrl)})` }}
+          />
+        ) : (
+          <DishIllustration
+            seed={recipe.illustrationSeed}
+            tags={[...recipe.ingredientTags, ...recipe.cuisineTags]}
+            className="h-28 w-28 shrink-0 self-start"
+          />
+        )}
         <div className="min-w-0 flex-1">
           <div className="mb-1 flex flex-wrap items-center gap-2">
             <StatusPill status={recipe.status} />
